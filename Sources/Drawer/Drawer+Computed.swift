@@ -35,8 +35,8 @@ extension Drawer {
     public var body: some View {
         
         if (sizeClass != SizeClass(
-                horizontal: horizontalSizeClass,
-                vertical: verticalSizeClass)) {
+            horizontal: horizontalSizeClass,
+            vertical: verticalSizeClass)) {
             DispatchQueue.main.async {
                 self.sizeClass = SizeClass(
                     horizontal: self.horizontalSizeClass,
@@ -44,20 +44,24 @@ extension Drawer {
             }
         }
         
-        return ZStack(alignment: Alignment(horizontal: .center,
-                                           vertical: .bottom)) {
-            
-            GeometryReader { proxy in
-                VStack(alignment: .leading) {
-                    self.content
-                    Spacer()
-                }
-                .offset(y: proxy.frame(in: .global).height + self.offset)
-                .frame(maxHeight: .infinity)
-                .animation(self.animation)
-                .gesture(self.dragGesture)
-                .edgesIgnoringSafeArea(.all)
+        return GeometryReader { proxy in
+            VStack {
+                Spacer()
+                    .frame(height: calculateSpacerSize(proxy))
+                
+                self.content
+                    .frame(height: self.fullHeight)
+                    .offset(y: self.offset)
+                    .animation(self.animation)
+                    .gesture(self.dragGesture)
             }
         }
+    }
+    
+    // MARK: - Private
+    
+    private func calculateSpacerSize(_ proxy: GeometryProxy) -> CGFloat {
+        let minHeight = heights.min() ?? 0
+        return proxy.size.height - fullHeight + (fullHeight - minHeight)
     }
 }
